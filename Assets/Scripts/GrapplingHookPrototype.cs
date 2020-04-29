@@ -8,7 +8,7 @@ public class GrapplingHookPrototype : MonoBehaviour
     public GameObject grapplingHookProjectilePrefab;
     private GrapplingHookProjectile projectile;
     const float OFFSET = 0.1f;
-    const float STIFFNESS = 100f;
+    const float STIFFNESS = 70f;
 
     const float RODSOFTNESS = 0.1f;
 
@@ -16,10 +16,12 @@ public class GrapplingHookPrototype : MonoBehaviour
 
     Rigidbody2D rb;
 
-    HookType hookType;
+    public HookType hookType = HookType.SPRINGROPE;
 
+    LineRenderer lineRenderer;
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
+        lineRenderer = GetComponent<LineRenderer>();
     }
 
 
@@ -32,7 +34,7 @@ public class GrapplingHookPrototype : MonoBehaviour
         dummy.restingLength = 0;
         hookAnker = dummy;
 
-        hookType = HookType.ROD;
+        lineRenderer.material.color = Color.green;
     }
 
     // Update is called once per frame
@@ -46,10 +48,26 @@ public class GrapplingHookPrototype : MonoBehaviour
         {
             ShootProjectile(shootingDirection.normalized);
         }
+
+        DrawHook();
     }
 
     private void FixedUpdate() {
         HookPhysicsUpdate(hookType);
+    }
+
+    private void DrawHook()
+    {
+        if(hookAnker.valid)
+        {
+            lineRenderer.SetPosition(0, transform.position);
+            lineRenderer.SetPosition(1, hookAnker.position);
+        }
+        else
+        {
+            lineRenderer.SetPosition(0, Vector3.zero);
+            lineRenderer.SetPosition(1, Vector3.zero);
+        }
     }
 
     private void HookPhysicsUpdate(HookType hookType)
@@ -102,6 +120,7 @@ public class GrapplingHookPrototype : MonoBehaviour
             Vector2 distanceVector = new Vector2(hookAnker.position.x, hookAnker.position.y) - new Vector2(transform.position.x, transform.position.y);
             float distance = distanceVector.magnitude;
 
+            lineRenderer.material.color = Color.green;
 
 
             Vector2 direction = distanceVector.normalized;
@@ -110,6 +129,9 @@ public class GrapplingHookPrototype : MonoBehaviour
             {
                 return;
             }
+
+            lineRenderer.material.color = Color.red;
+
 
             Vector2 springForce = delta * STIFFNESS * direction;
 
@@ -122,7 +144,7 @@ public class GrapplingHookPrototype : MonoBehaviour
             //THIS IS VERY HARD
             //MAYBE USE UNITY HINGEJOINT INSTEAD
 
-            
+
             Vector2 distanceVector = new Vector2(hookAnker.position.x, hookAnker.position.y) - new Vector2(transform.position.x, transform.position.y);
             float distance = distanceVector.magnitude;
             float delta = distance - hookAnker.restingLength;
@@ -195,7 +217,7 @@ public class GrapplingHookPrototype : MonoBehaviour
 
 
 
-    private enum HookType{
+    public enum HookType{
         SPRING,
         ROPE,
         SPRINGROPE,
