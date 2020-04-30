@@ -134,10 +134,12 @@ GameObject:
   - component: {fileID: 212160538}
   - component: {fileID: 212160539}
   - component: {fileID: 212160540}
-  m_Layer: 0
+  - component: {fileID: 212160541}
+  - component: {fileID: 212160542}
+  m_Layer: 9
   m_Name: BouncyCharacter
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 7250588514170254948, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -157,10 +159,10 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 6200000, guid: 952ddeeb0924fd946b866bc2fe348172, type: 2}
+  m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!4 &212160537
 Transform:
@@ -170,11 +172,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 212160535}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -19.96, y: -10.15, z: -0.36132812}
+  m_LocalPosition: {x: -6.58, y: -2.82, z: -0.36132812}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1426182414}
   - {fileID: 1464078099}
+  - {fileID: 267146564}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -204,7 +207,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grapplingHookProjectilePrefab: {fileID: 6321769103533826326, guid: 08f4c0b8bf2e93649868c8e2a873a964,
     type: 3}
-  hookType: 1
+  hookType: 2
 --- !u!120 &212160540
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -302,6 +305,70 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
+--- !u!114 &212160541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 212160535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf882e5bd9d264e47b64bc0ab0261711, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  softness: 1
+  softMaterial: {fileID: 6200000, guid: 4c1ff93b390c25547b465b7e3d3404e5, type: 2}
+  bouncyMaterial: {fileID: 6200000, guid: 952ddeeb0924fd946b866bc2fe348172, type: 2}
+  hardMaterial: {fileID: 6200000, guid: 1e346853b59e7dd4fab4fd54d9f42c22, type: 2}
+  formerSoftness: 1
+--- !u!114 &212160542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 212160535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 385ccd981bd25e74cb5c979362bdb22f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  surfaceRadius: 1
+  surfacePointPrefab: {fileID: 3619740239886538646, guid: af21cfcfe26eabb4585f687662252cbc,
+    type: 3}
+  surfacePoints: []
+  surfacePointHolder: {fileID: 267146564}
+--- !u!1 &267146563
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 267146564}
+  m_Layer: 8
+  m_Name: SurfacePoints
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &267146564
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 267146563}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 212160537}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -501,7 +568,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1426182414}
   - component: {fileID: 1426182415}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -531,7 +598,7 @@ CircleCollider2D:
   m_GameObject: {fileID: 1426182413}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 952ddeeb0924fd946b866bc2fe348172, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -548,7 +615,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1464078099}
   - component: {fileID: 1464078100}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}

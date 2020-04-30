@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2049105899137037465}
   - component: {fileID: 2049105899137037462}
   - component: {fileID: 2049105899137037463}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SimplePlatform
   m_TagString: Hookable
   m_Icon: {fileID: 0}
