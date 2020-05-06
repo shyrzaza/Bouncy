@@ -2,11 +2,12 @@
 {
     Properties
     {
-        _ShellNormal ("Shell Normal", 2D) = "bump" {}
-		_ShellAlpha("Shell Alpha", 2D) = "white" {}
-		_HardTint ("Hard Tint", Color) = (0.0, 0.7, 0.0, 1.0)
+		_HardTex ("Hard Texture", 2D) = "white" {}
 		_MediumTint("Medium Tint", Color) = (0.0, 0.7, 0.0, 1.0)
+		_SoftCol ("Soft Coor", Color) = (0.0, 0.8, 0.0, 1.0)
 		_Hardness("Hardness", Range(-1, 1)) = 0
+		_Ambient("Ambient", Range(0, 1)) = 0.2
+		_BowlingGloss ("Bowling Gloss", Range(0, 1)) = 0.35
     }
     SubShader
     {
@@ -29,6 +30,7 @@
             #pragma fragment frag
 
             #include "UnityCG.cginc"
+			#include "UnityLightingCommon.cginc"
 
             struct appdata
             {
@@ -47,61 +49,66 @@
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
 				o.uv_ext.zw = UnityObjectToWorldDir(float3(v.uv * 2 - float2(1, 1), 0)); // 5Head
-				o.uv_ext.xy = o.uv_ext.zw * 0.5 + (0.5).rr;
+				o.uv_ext.xy = v.uv;
 
                 return o;
             }
 
 			float4 _MediumTint;
-			float4 _HardTint;
+			float _Ambient;
+			sampler2D _HardTex;
+			float _BowlingGloss;
+			float4 _SoftCol;
 
-			sampler2D _ShellNormal;
-			sampler2D _ShellAlpha;
+			float4 soft_hard(float nl_raw) {
+				
+				float gloss = 0;
 
-			float3 medium_hard(float2 uv_ext) {
-				// Transform UV to half-sphere normal
-				float nangle = min(1, length(uv_ext));
-				float3 nor = float3(uv_ext, -1 + nangle * nangle);
+				if (nl_raw > 0.7) {
+					gloss = 0.2;
+				} else if (nl_raw > 0.4) {
+					gloss = 0.1;
+				}
+				else if (nl_raw < -0.6) {
+					gloss = -0.2;
+				}
+				else if (nl_raw < -0.2) {
+					gloss = -0.1;
+				}
 
-				// NL lighting for directional light source
-				float nl = max(0, dot(nor, _WorldSpaceLightPos0.xyz));
-
-				return _MediumTint * (nl.rrr + ShadeSH9(half4(nor, 1)));
+				return float4(_SoftCol.rgb + gloss, _SoftCol.a);
 			}
 
-			float3 hard_hard(float2 uv, float fadein) {
-				float3 nor = tex2D(_ShellNormal, uv);
-				nor.x = nor.x * 2 - 1;
-				nor.y = nor.y * 2 - 1;
-				float nxyl = length(nor.xy);
-				nor.z = -1 + nxyl * nxyl;
-				// Tight
+			float4 medium_hard(float nl) {
+				float gloss = step(0.5, nl) * 0.05;
+				return float4(_MediumTint.rgb * (nl + _Ambient) + gloss, 1);
+			}
 
-				// NL lighting for directional light source
-				float nl = max(0, dot(nor, _WorldSpaceLightPos0.xyz));
-
-				return _HardTint * (nl.rrr + ShadeSH9(half4(nor, 1)));
+			float4 hard_hard(float2 uv, float nl) {
+				float4 col = tex2D(_HardTex, uv);
+				float gloss = step(0.6, nl) * _BowlingGloss;
+				return float4(col.rgb * (nl + _Ambient) + gloss, col.a);
 			}
 
 			float _Hardness;
 
             fixed4 frag (v2f i) : SV_Target
             {
-				float sat_hardness = smoothstep(0, 1, saturate(_Hardness));
+				// Transform UV to half-sphere normal
+				float nangle = min(1, length(i.uv_ext.zw));
+				float3 nor = float3(i.uv_ext.zw, -1 + nangle * nangle);
 
-				// Shrink UV 10% to account for clean edges
-				float2 shell_uv = (i.uv_ext.xy - (.5).rr) * 1.05 + (.5).rr;
+				// NL lighting for directional light source
+				float nl_raw = dot(nor, _WorldSpaceLightPos0.xyz);
+				float nl = max(0, nl_raw);
 
-				// Alpha uv affected by fade-in
-				float2 scaled_uv = (shell_uv - (.5).rr) * lerp(0.8, 1, sat_hardness) + (.5).rr;
+				float4 soft = soft_hard(nl_raw);
+				float4 medium = medium_hard(nl);
+				float4 hard = hard_hard(i.uv_ext.xy, nl);
 
-				float a = tex2D(_ShellAlpha, scaled_uv).r;
+				float4 col = lerp(soft, lerp(medium, hard, smoothstep(0, 1, saturate(_Hardness)) * hard.a), min(1, _Hardness + 1)); 
 
-				float3 soft = float3(1.0, 0.0, 1.0);
-				float3 medium = medium_hard(i.uv_ext.zw);
-				float3 hard = hard_hard(scaled_uv, sat_hardness);
-
-				return fixed4(lerp(soft, lerp(medium, hard, sat_hardness), min(1, _Hardness + 1)), a);
+				return float4(col.rgb * _LightColor0.rgb, col.a);
             }
             ENDCG
         }

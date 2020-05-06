@@ -12,7 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af7181f404f1447c0a7a17b3070b952b, type: 3}
   m_Name: BlobShape
   m_EditorClassIdentifier: 
-  m_Angles: []
+  m_Angles:
+  - m_Start: -338
+    m_End: 22
+    m_Order: 0
+    m_Sprites:
+    - {fileID: 21300000, guid: 8c4a964b2a797374fbeaa8732ad6582f, type: 3}
   m_FillTexture: {fileID: 2800000, guid: 8c4a964b2a797374fbeaa8732ad6582f, type: 3}
   m_CornerSprites:
   - m_CornerType: 0
