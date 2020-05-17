@@ -5,6 +5,14 @@ TagManager:
   serializedVersion: 2
   tags:
   - Hookable
+  - ground
+  - Obstacle
+  - BombPickup
+  - Enemy
+  - ExplosionFX
+  - Bullet
+  - HealthBar
+  - Sticky
   layers:
   - Default
   - TransparentFX
@@ -17,8 +25,8 @@ TagManager:
   - SurfacePoints
   - Player
   - Obstacle
-  - 
-  - 
+  - Goal
+  - Debris
   - 
   - 
   - 

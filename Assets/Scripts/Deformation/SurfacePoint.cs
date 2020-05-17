@@ -10,6 +10,8 @@ public class SurfacePoint : MonoBehaviour
     const float STIFFNESS = 200f;
 
     public Vector2 parentVelocity;
+    public float circleCheckRadius = 0.1f;
+    public LayerMask contactCheckMask;
 
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
@@ -70,7 +72,27 @@ public class SurfacePoint : MonoBehaviour
     }
 
 
+    public void ApplySpringForce(Vector2 force)
+    {
+        rb.AddForce(force);
+    }
 
+    public bool ContactCheck(out string tag)
+    {
+        Collider2D result = Physics2D.OverlapCircle(transform.position, circleCheckRadius, contactCheckMask);
+
+        if(result != null)
+        {
+            tag = result.gameObject.tag;
+            return true;
+        }
+        else
+        {
+            tag = "";
+            return false;
+        }
+
+    }
 
 
 }

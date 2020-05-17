@@ -5,8 +5,10 @@ using UnityEngine;
 public class DeformationManager : MonoBehaviour
 {
 
-    const int NUM_SURFACEPOINTS = 12;
+    const int NUM_SURFACEPOINTS = 10;
     public float surfaceRadius = 1.5f;
+    const float NEIGHBOR_SPRING_STIFFNESS = 1000f;
+    public float tangentStrength = 5.0f;
 
     public GameObject surfacePointPrefab;
     public SurfacePoint[] surfacePoints;
@@ -15,6 +17,13 @@ public class DeformationManager : MonoBehaviour
     private Vector3[] localSurfacePointTargetPositions;
 
     private Rigidbody2D rb;
+
+    public SpriteShapeManager spriteShapeManager;
+
+    private float restingLength;
+
+
+
 
     private void Awake() {
         surfacePoints = new SurfacePoint[NUM_SURFACEPOINTS];
@@ -26,12 +35,22 @@ public class DeformationManager : MonoBehaviour
     void Start()
     {
         InitializeSurfacePoints();
+        spriteShapeManager.InitializeSurfacePoints(gameObject.transform, surfacePoints);
+        spriteShapeManager.SetTangentStrength(tangentStrength);
+
     }
 
     // Update is called once per frame
     void Update()
     {
         UpdateTargetPositions();
+        UpdateTangents();
+
+    }
+
+    void FixedUpdate()
+    {
+        CalcAndApplyNeighborSpringForces();
     }
 
 
@@ -41,6 +60,19 @@ public class DeformationManager : MonoBehaviour
         {
             surfacePoints[i].targetPosition = transform.position + localSurfacePointTargetPositions[i];
             surfacePoints[i].parentVelocity = rb.velocity;
+        }
+    }
+
+    void UpdateTangents()
+    {
+        for(int i = 0; i < surfacePoints.Length; i++)
+        {
+            SurfacePoint surfacePointLeft = surfacePoints[(i - 1 + surfacePoints.Length) % surfacePoints.Length];
+            SurfacePoint surfacePointRight = surfacePoints[(i + 1) % surfacePoints.Length];
+            SurfacePoint targetPoint = surfacePoints[i];
+
+            Vector3 tangent = surfacePointLeft.transform.position - surfacePointRight.transform.position;
+            spriteShapeManager.UpdateTangentAt(i, tangent);
         }
     }
     private void InitializeSurfacePoints()
@@ -57,5 +89,42 @@ public class DeformationManager : MonoBehaviour
             surfacePoints[i] = Instantiate(surfacePointPrefab, transform.position + pos, Quaternion.identity).GetComponent<SurfacePoint>();
             surfacePoints[i].transform.parent = surfacePointHolder;
         }
+
+        restingLength = (surfacePoints[0].transform.position - surfacePoints[1].transform.position).magnitude;
+    }
+
+
+    private void CalcAndApplyNeighborSpringForces()
+    {
+        for(int i = 0; i < surfacePoints.Length; i ++)
+        {
+            SurfacePoint A = surfacePoints[i];
+            SurfacePoint B = surfacePoints[(i + 1) % surfacePoints.Length];
+
+            //calculate spring force
+            Vector2 distanceVector = new Vector2(A.transform.position.x, A.transform.position.y) - new Vector2(B.transform.position.x, B.transform.position.y);
+            float distance = distanceVector.magnitude;
+            Vector2 direction = distanceVector.normalized;
+            float delta = distance - restingLength;
+
+            Vector2 springForce = delta * NEIGHBOR_SPRING_STIFFNESS * direction;
+
+            A.ApplySpringForce(-springForce);
+            B.ApplySpringForce(springForce);
+        }
+    }
+
+    public bool CheckForContact(out string tag)
+    {
+        for(int i = 0; i < surfacePoints.Length; i++)
+        {
+            if(surfacePoints[i].ContactCheck(out tag))
+            {
+                return true;
+            }
+        }
+
+        tag = "";
+        return false;
     }
 }
