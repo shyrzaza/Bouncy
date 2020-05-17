@@ -37,12 +37,14 @@
             struct appdata
             {
                 float4 vertex : POSITION;
+				float4 col: COLOR;
                 float2 uv : TEXCOORD0;
             };
 
             struct v2f
             {
                 float4 vertex : SV_POSITION;
+				float4 col: COLOR;
 				float4 uv_ext : TEXCOORD0;
             };
 
@@ -50,6 +52,7 @@
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
+				o.col = v.col;
 				o.uv_ext.zw = UnityObjectToWorldDir(float3(v.uv * 2 - float2(1, 1), 0)); // 5Head
 				o.uv_ext.xy = v.uv;
 
@@ -112,7 +115,7 @@
 
 				float4 col = lerp(soft, lerp(medium, hard, smoothstep(0, 1, saturate(_Hardness)) * hard.a), min(1, _Hardness + 1)); 
 
-				return float4(col.rgb * _LightColor0.rgb, col.a);
+				return float4(col.rgb * _LightColor0.rgb * i.col.rgb, col.a * i.col.a);
             }
             ENDCG
         }
