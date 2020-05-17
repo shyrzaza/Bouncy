@@ -3,11 +3,13 @@
     Properties
     {
 		_HardTex ("Hard Texture", 2D) = "white" {}
+		_HardTint ("Hard Tint", Color) = (0.0, 0.6, 0.0, 1.0)
 		_MediumTint("Medium Tint", Color) = (0.0, 0.7, 0.0, 1.0)
-		_SoftCol ("Soft Coor", Color) = (0.0, 0.8, 0.0, 1.0)
+		_SoftCol ("Soft Tint", Color) = (0.0, 0.8, 0.0, 1.0)
 		_Hardness("Hardness", Range(-1, 1)) = 0
 		_Ambient("Ambient", Range(0, 1)) = 0.2
 		_BowlingGloss ("Bowling Gloss", Range(0, 1)) = 0.35
+		_MediumGloss ("Medium Gloss", Range(0, 0.2)) = 0.05
     }
     SubShader
     {
@@ -54,10 +56,12 @@
                 return o;
             }
 
+			float4 _HardTint;
 			float4 _MediumTint;
 			float _Ambient;
 			sampler2D _HardTex;
 			float _BowlingGloss;
+			float _MediumGloss;
 			float4 _SoftCol;
 
 			float4 soft_hard(float nl_raw) {
@@ -80,12 +84,12 @@
 			}
 
 			float4 medium_hard(float nl) {
-				float gloss = step(0.5, nl) * 0.05;
+				float gloss = step(0.5, nl) * _MediumGloss;
 				return float4(_MediumTint.rgb * (nl + _Ambient) + gloss, 1);
 			}
 
 			float4 hard_hard(float2 uv, float nl) {
-				float4 col = tex2D(_HardTex, uv);
+				float4 col = tex2D(_HardTex, uv) * _HardTint;
 				float gloss = step(0.6, nl) * _BowlingGloss;
 				return float4(col.rgb * (nl + _Ambient) + gloss, col.a);
 			}
