@@ -76,7 +76,7 @@ public class RopeRenderer : MonoBehaviour
         var segmentLengths = contactPoints.Zip(contactPoints.Skip(1), Vector3.Distance).ToArray();
         var totalLen = segmentLengths.Sum();
 
-        var stress = Mathf.Clamp01((totalLen - RestLength) / (MaxVisualStretchLength - RestLength));
+        var stress = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((totalLen - RestLength) / (MaxVisualStretchLength - RestLength)));
 
         var lenAcc = 0.0f;
         var keyFrames = segmentLengths.Select((sLen, sId) =>
