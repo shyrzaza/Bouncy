@@ -52,4 +52,10 @@ public class LevelManager : MonoBehaviour
         Debug.Log("Cleared the Level!");
         SceneManager.LoadScene(++currentLevel);
     }
+
+
+    public void ReloadLevel()
+    {
+        SceneManager.LoadScene(currentLevel);
+    }
 }

@@ -19,13 +19,37 @@ public class BreakableObject : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-
-        GetComponent<Explodable>().explode();
-        List<GameObject> fragments = GetComponent<Explodable>().fragments;
-        foreach(GameObject go in fragments)
+        
+        if(other.gameObject.tag != "Player")
+        {
+            return;
+        }
+        else
         {
 
+            //check consistency
+            if (other.gameObject.transform.root.gameObject.GetComponent<PlayerStateBehaviour>().GetCurrentPlayerState() != PlayerState.HARD)
+            {
+                return;
+            }
+            else
+            {
+                //check speed
+          
+
+                GetComponent<Explodable>().explode();
+                List<GameObject> fragments = GetComponent<Explodable>().fragments;
+                foreach (GameObject go in fragments)
+                {
+                    Vector2 dist = go.transform.position - other.gameObject.transform.root.gameObject.transform.position;
+                    go.GetComponent<Rigidbody2D>().AddForce(dist.normalized * 50.0f, ForceMode2D.Impulse);
+                }
+            }
         }
+
+
+
+
 
     }
 }
