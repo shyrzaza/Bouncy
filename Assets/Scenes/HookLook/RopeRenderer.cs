@@ -30,10 +30,13 @@ public class RopeRenderer : MonoBehaviour
 
     private GradientColorKey[] _colorKeys;
 
+    private GradientAlphaKey[] _alphaKeys;
+
     private void Awake()
     {
         _worldPoints = new Vector3[RenderPoints];
         _lineRenderer = GetComponent<LineRenderer>();
+        _lineRenderer.useWorldSpace = true;
 
         _lineRenderer.positionCount = RenderPoints;
 
@@ -48,6 +51,13 @@ public class RopeRenderer : MonoBehaviour
             new GradientColorKey(RestColor, 0f),
             new GradientColorKey(RestColor, 0.5f),
             new GradientColorKey(RestColor, 1.0f)
+        };
+
+        _alphaKeys = new[]
+        {
+            new GradientAlphaKey(RestColor.a, 0f),
+            new GradientAlphaKey(RestColor.a, 0.5f),
+            new GradientAlphaKey(RestColor.a, 1.0f),
         };
 
         _lineRenderer.enabled = false;
@@ -103,9 +113,12 @@ public class RopeRenderer : MonoBehaviour
 
         _lineRenderer.widthCurve = new AnimationCurve(_widthKeyframes);
 
-        _colorKeys[1] = new GradientColorKey(Color.Lerp(RestColor, StressColor, stress), 0.5f);
+        var midpointColor = Color.Lerp(RestColor, StressColor, stress);
+        _colorKeys[1] = new GradientColorKey(midpointColor, 0.5f);
+        _alphaKeys[1] = new GradientAlphaKey(midpointColor.a, 0.5f);
         var gradient = new Gradient();
         gradient.colorKeys = _colorKeys;
+        gradient.alphaKeys = _alphaKeys;
         _lineRenderer.colorGradient = gradient;
 
         _lineRenderer.SetPositions(_worldPoints.ToArray());
