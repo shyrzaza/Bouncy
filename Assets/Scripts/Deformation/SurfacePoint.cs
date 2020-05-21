@@ -19,6 +19,8 @@ public class SurfacePoint : MonoBehaviour
     float maxDistanceCorrectionSpeed = 0.9f;
 
 
+    Vector3 lastCollisionNormal;
+
     public void SetNewDeformationParameters(float stiffness, float alignVelocityStrength, float maxDistance, float maxDistanceCorrectionSpeed)
     {
         this.STIFFNESS = stiffness;
@@ -104,7 +106,7 @@ public class SurfacePoint : MonoBehaviour
     }
 
 
-    public void ApplySpringForce(Vector2 force)
+    public void ApplyForce(Vector2 force)
     {
         rb.AddForce(force);
     }
@@ -116,6 +118,7 @@ public class SurfacePoint : MonoBehaviour
         if(result != null)
         {
             tag = result.gameObject.tag;
+            
             return true;
         }
         else
@@ -125,6 +128,7 @@ public class SurfacePoint : MonoBehaviour
         }
 
     }
+
 
 
 }

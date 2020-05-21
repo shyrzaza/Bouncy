@@ -20,9 +20,11 @@ public class State_Soft : State<PlayerStateBehaviour>
 
 
         player.deformationManager.UpdateSurfacePointParameters(200f, 10f, 1f, 0.9f);
-        player.deformationManager.UpdateDeformationManagerParameters(1000f, 5f);
+        player.deformationManager.UpdateDeformationManagerParameters(1000f, 5f, 1000f);
 
         PlayerMovementPrototype.OnContact += OnContact;
+        PlayerMovementPrototype.OnContactStay += OnContactStay;
+        PlayerMovementPrototype.OnContactExit += OnContactExit;
 
 
     }
@@ -30,6 +32,8 @@ public class State_Soft : State<PlayerStateBehaviour>
     {
         // Debug.Log("Exit soft");
         PlayerMovementPrototype.OnContact -= OnContact;
+        PlayerMovementPrototype.OnContactStay -= OnContactStay;
+        PlayerMovementPrototype.OnContactExit -= OnContactExit;
 
     }
     public override void Execute(PlayerStateBehaviour player)
@@ -61,10 +65,20 @@ public class State_Soft : State<PlayerStateBehaviour>
     }
 
 
-    public override void OnContact(PlayerStateBehaviour player, string tag)
+    public override void OnContact(PlayerStateBehaviour player, string tag, Vector2 normal)
     {
         Debug.Log("OnContactSoft");
+    }
+    public override void OnContactStay(PlayerStateBehaviour player, string tag, Vector2 normal)
+    {
+        Debug.Log("OnContactStaySoft");
+        Debug.DrawLine(player.transform.position, player.transform.position + new Vector3(normal.x, normal.y, 0) * 5f);
 
+        player.transform.GetComponent<DeformationManager>().ApplyForceToSurfacePoints(-normal * 100f);
+    }
+    public override void OnContactExit(PlayerStateBehaviour player, string tag, Vector2 normal)
+    {
+        Debug.Log("OnContactExitSoft");
     }
 
 

@@ -6,7 +6,7 @@ using UnityEngine;
 public class State_Bouncy : State<PlayerStateBehaviour>
 {
 
-    public float desiredColliderRadius = 1.0f;
+    public float desiredColliderRadius = 1f;
 
     public State_Bouncy()
     {
@@ -21,8 +21,10 @@ public class State_Bouncy : State<PlayerStateBehaviour>
         player.circleCollider.sharedMaterial = player.bouncyMaterial;
 
         player.deformationManager.UpdateSurfacePointParameters(0, 0f, -1f, 1f);
-        player.deformationManager.UpdateDeformationManagerParameters(0f, 5f);
+        player.deformationManager.UpdateDeformationManagerParameters(0f, 5f, 0f);
         PlayerMovementPrototype.OnContact += OnContact;
+        PlayerMovementPrototype.OnContactStay += OnContactStay;
+        PlayerMovementPrototype.OnContactExit += OnContactExit;
 
 
     }
@@ -31,6 +33,8 @@ public class State_Bouncy : State<PlayerStateBehaviour>
     {
         //Debug.Log("Exit bouncy");
         PlayerMovementPrototype.OnContact -= OnContact;
+        PlayerMovementPrototype.OnContactStay -= OnContactStay;
+        PlayerMovementPrototype.OnContactExit -= OnContactExit;
 
     }
 
@@ -66,9 +70,17 @@ public class State_Bouncy : State<PlayerStateBehaviour>
         }
     }
 
-    public override void OnContact(PlayerStateBehaviour player, string tag)
+    public override void OnContact(PlayerStateBehaviour player, string tag, Vector2 normal)
     {
         Debug.Log("OnContactBouncy");
+    }
+    public override void OnContactStay(PlayerStateBehaviour player, string tag, Vector2 normal)
+    {
+        Debug.Log("OnContactStayBouncy");
+    }
+    public override void OnContactExit(PlayerStateBehaviour player, string tag, Vector2 normal)
+    {
+        Debug.Log("OnContactExitBouncy");
     }
 
     public override string ToString()

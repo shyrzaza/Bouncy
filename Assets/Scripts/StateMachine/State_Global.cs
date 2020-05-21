@@ -22,9 +22,14 @@ public class State_Global : State<PlayerStateBehaviour>
 
 
 
-    public override void OnContact(PlayerStateBehaviour player, string tag)
+    public override void OnContact(PlayerStateBehaviour player, string tag, Vector2 normal)
     {
-
+    }
+    public override void OnContactStay(PlayerStateBehaviour player, string tag, Vector2 normal)
+    {
+    }
+    public override void OnContactExit(PlayerStateBehaviour player, string tag, Vector2 normal)
+    {
     }
 
 

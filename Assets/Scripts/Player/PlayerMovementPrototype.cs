@@ -29,9 +29,12 @@ public class PlayerMovementPrototype : MonoBehaviour
     bool inContact = false;
     bool inContactLastFrame = false;
     string contactTag = "";
+    Vector2 contactNormal = Vector2.zero;
 
-    public delegate void voidDelegate(PlayerStateBehaviour player, string tag);
+    public delegate void voidDelegate(PlayerStateBehaviour player, string tag, Vector2 normal);
     public static voidDelegate OnContact;
+    public static voidDelegate OnContactStay;
+    public static voidDelegate OnContactExit;
 
 
 
@@ -65,14 +68,24 @@ public class PlayerMovementPrototype : MonoBehaviour
 
 
         //check for contact and trigger event
-        inContact = deformationManager.CheckForContact(out contactTag);
+        inContact = deformationManager.CheckForContact(out contactTag, out contactNormal);
         if(inContact && !inContactLastFrame)
         {
             if(OnContact != null)
             {
-                OnContact(GetComponent<PlayerStateBehaviour>(), contactTag);
+                OnContact(GetComponent<PlayerStateBehaviour>(), contactTag, contactNormal);
             }
         }
+        else if(inContact && inContactLastFrame)
+        {
+             OnContactStay(GetComponent<PlayerStateBehaviour>(), contactTag, contactNormal);
+        }
+        else if(!inContact && inContactLastFrame)
+        {
+            OnContactExit(GetComponent<PlayerStateBehaviour>(), contactTag, contactNormal);
+        }
+
+
         inContactLastFrame = inContact;
 
 

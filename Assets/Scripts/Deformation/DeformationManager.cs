@@ -8,6 +8,9 @@ public class DeformationManager : MonoBehaviour
     const int NUM_SURFACEPOINTS = 20;
     public float surfaceRadius = 1.5f;
     float NEIGHBOR_SPRING_STIFFNESS = 1000f;
+
+    float OPPOSITES_SPRING_STIFFNESS = 1000f;
+
     public float tangentStrength = 5.0f;
 
     public GameObject surfacePointPrefab;
@@ -22,13 +25,16 @@ public class DeformationManager : MonoBehaviour
 
     private float restingLength;
 
+    private float oppositeRestingLength;
+
 
     public CircleCollider2D collider;
 
 
-    public void UpdateDeformationManagerParameters(float neighborSpringStiffness, float tangentStrength)
+    public void UpdateDeformationManagerParameters(float neighborSpringStiffness, float tangentStrength, float oppositesSpringStiffness)
     {
         this.NEIGHBOR_SPRING_STIFFNESS = neighborSpringStiffness;
+        this.OPPOSITES_SPRING_STIFFNESS = oppositesSpringStiffness;
         this.tangentStrength = tangentStrength;
     }
     public void UpdateSurfacePointParameters(float stiffness, float alignVelocityStrength, float maxDistance, float maxDistanceCorrectionSpeed)
@@ -40,6 +46,9 @@ public class DeformationManager : MonoBehaviour
     }
 
     private void Awake() {
+
+        Debug.Assert(NUM_SURFACEPOINTS % 2 == 0, "nice try bro");
+
         surfacePoints = new SurfacePoint[NUM_SURFACEPOINTS];
         localSurfacePointTargetPositions = new Vector3[NUM_SURFACEPOINTS];
         rb = GetComponent<Rigidbody2D>();
@@ -66,6 +75,7 @@ public class DeformationManager : MonoBehaviour
     void FixedUpdate()
     {
         CalcAndApplyNeighborSpringForces();
+        CalcAndApplyOppositeSpringForces();
     }
 
 
@@ -106,12 +116,13 @@ public class DeformationManager : MonoBehaviour
         }
 
         restingLength = (surfacePoints[0].transform.position - surfacePoints[1].transform.position).magnitude;
+        oppositeRestingLength = ((surfacePoints[0].transform.position - surfacePoints[(int)(surfacePoints.Length / 2)].transform.position).magnitude);
     }
 
 
     private void CalcAndApplyNeighborSpringForces()
     {
-        for(int i = 0; i < surfacePoints.Length; i ++)
+        for (int i = 0; i < surfacePoints.Length; i++)
         {
             SurfacePoint A = surfacePoints[i];
             SurfacePoint B = surfacePoints[(i + 1) % surfacePoints.Length];
@@ -124,22 +135,72 @@ public class DeformationManager : MonoBehaviour
 
             Vector2 springForce = delta * NEIGHBOR_SPRING_STIFFNESS * direction;
 
-            A.ApplySpringForce(-springForce);
-            B.ApplySpringForce(springForce);
+            A.ApplyForce(-springForce);
+            B.ApplyForce(springForce);
         }
     }
 
-    public bool CheckForContact(out string tag)
+
+    private void CalcAndApplyOppositeSpringForces()
     {
+        for (int i = 0; i < surfacePoints.Length; i++)
+        {
+            SurfacePoint A = surfacePoints[i];
+            SurfacePoint B = surfacePoints[(i + (int)(surfacePoints.Length/2)) % surfacePoints.Length];
+
+            //calculate spring force
+            Vector2 distanceVector = new Vector2(A.transform.position.x, A.transform.position.y) - new Vector2(B.transform.position.x, B.transform.position.y);
+            float distance = distanceVector.magnitude;
+            Vector2 direction = distanceVector.normalized;
+            float delta = distance - oppositeRestingLength;
+
+            Vector2 springForce = delta * OPPOSITES_SPRING_STIFFNESS * direction;
+
+            A.ApplyForce(-springForce);
+            B.ApplyForce(springForce);
+        }
+    }
+
+
+
+    public bool CheckForContact(out string tag, out Vector2 normal)
+    {
+        bool result = false;
+        string intermediateTag = "";
+        normal = Vector2.zero;
+        tag = "";
+
+        int counter = 0;
         for(int i = 0; i < surfacePoints.Length; i++)
         {
-            if(surfacePoints[i].ContactCheck(out tag))
+            if(surfacePoints[i].ContactCheck(out intermediateTag))
             {
-                return true;
+                if(intermediateTag != "")
+                {
+                    tag = intermediateTag;
+                }
+                result = true;
+                Vector3 estimation = (transform.position - surfacePoints[i].targetPosition).normalized;
+                normal += new Vector2(estimation.x, estimation.y);
+                counter++;
             }
         }
+        normal /= (float)counter;
 
-        tag = "";
-        return false;
+        return result;
+    }
+
+
+    public Vector2 EstimateNormal()
+    {
+        return Vector2.zero;
+    }
+
+    public void ApplyForceToSurfacePoints(Vector2 force)
+    {
+        for (int i = 0; i < surfacePoints.Length; i++)
+        {
+            surfacePoints[i].ApplyForce(force);
+        }
     }
 }

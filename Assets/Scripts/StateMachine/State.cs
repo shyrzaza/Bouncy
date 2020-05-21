@@ -12,7 +12,9 @@ public abstract class State<T>{
 	public abstract void Exit(T entity);
 	public abstract void Execute(T entity);
 	public abstract void FixedExecute(T entity);
-    public abstract void OnContact(PlayerStateBehaviour player, string tag);
+    public abstract void OnContact(PlayerStateBehaviour player, string tag, Vector2 normal);
+    public abstract void OnContactStay(PlayerStateBehaviour player, string tag, Vector2 normal);
+    public abstract void OnContactExit(PlayerStateBehaviour player, string tag, Vector2 normal);
 
     //public abstract bool OnMessage(T entity, Telegram msg);
 

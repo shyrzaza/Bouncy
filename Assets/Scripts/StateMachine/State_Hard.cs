@@ -14,13 +14,20 @@ public class State_Hard : State<PlayerStateBehaviour>
     public override void Enter(PlayerStateBehaviour player)
     {
         //Debug.Log("Enter hard");
+        player.deformationManager.UpdateSurfacePointParameters(0, 0f, -1f, 1f);
+        player.deformationManager.UpdateDeformationManagerParameters(0f, 5f, 0f);
+
         player.circleCollider.sharedMaterial = player.hardMaterial;
         PlayerMovementPrototype.OnContact += OnContact;
+        PlayerMovementPrototype.OnContactStay += OnContactStay;
+        PlayerMovementPrototype.OnContactExit += OnContactExit;
     }
     public override void Exit(PlayerStateBehaviour player)
     {
         //Debug.Log("Exit hard");
         PlayerMovementPrototype.OnContact -= OnContact;
+        PlayerMovementPrototype.OnContactStay -= OnContactStay;
+        PlayerMovementPrototype.OnContactExit -= OnContactExit;
     }
     public override void Execute(PlayerStateBehaviour player)
     {
@@ -47,10 +54,17 @@ public class State_Hard : State<PlayerStateBehaviour>
     }
 
 
-    public override void OnContact(PlayerStateBehaviour player, string tag)
+    public override void OnContact(PlayerStateBehaviour player, string tag, Vector2 normal)
     {
-        Debug.Log("OnContactSoft");
-
+        Debug.Log("OnContactHard");
+    }
+    public override void OnContactStay(PlayerStateBehaviour player, string tag, Vector2 normal)
+    {
+        Debug.Log("OnContactStayHard");
+    }
+    public override void OnContactExit(PlayerStateBehaviour player, string tag, Vector2 normal)
+    {
+        Debug.Log("OnContactExitHard");
     }
 
     public override string ToString()

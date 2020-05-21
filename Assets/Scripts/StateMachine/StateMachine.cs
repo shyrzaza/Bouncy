@@ -41,7 +41,6 @@ public class StateMachine<T>{
 
 		if(currentState != null)
 		{
-
 			currentState.Execute(owner);
 		}
 	}
