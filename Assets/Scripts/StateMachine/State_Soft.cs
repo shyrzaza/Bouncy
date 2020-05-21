@@ -5,9 +5,11 @@ using UnityEngine;
 public class State_Soft : State<PlayerStateBehaviour>
 {
 
+    float desiredColliderRadius = 0.5f;
     public State_Soft()
     {
         playerState = PlayerState.SOFT;
+
     }
 
 
@@ -15,10 +17,20 @@ public class State_Soft : State<PlayerStateBehaviour>
     {
        // Debug.Log("Enter soft");
         player.circleCollider.sharedMaterial = player.softMaterial;
+
+
+        player.deformationManager.UpdateSurfacePointParameters(200f, 10f, 1f, 0.9f);
+        player.deformationManager.UpdateDeformationManagerParameters(1000f, 5f);
+
+        PlayerMovementPrototype.OnContact += OnContact;
+
+
     }
     public override void Exit(PlayerStateBehaviour player)
     {
-       // Debug.Log("Exit soft");
+        // Debug.Log("Exit soft");
+        PlayerMovementPrototype.OnContact -= OnContact;
+
     }
     public override void Execute(PlayerStateBehaviour player)
     {
@@ -39,6 +51,23 @@ public class State_Soft : State<PlayerStateBehaviour>
             player.ChangeState(StateManager.Instance.hardState);
         }
     }
+
+    public override void FixedExecute(PlayerStateBehaviour player)
+    {
+        if (Mathf.Abs(player.deformationManager.collider.radius - desiredColliderRadius) > 0)
+        {
+            player.deformationManager.collider.radius += (desiredColliderRadius - player.deformationManager.collider.radius) * 0.9f;
+        }
+    }
+
+
+    public override void OnContact(PlayerStateBehaviour player, string tag)
+    {
+        Debug.Log("OnContactSoft");
+
+    }
+
+
 
     public override string ToString()
     {

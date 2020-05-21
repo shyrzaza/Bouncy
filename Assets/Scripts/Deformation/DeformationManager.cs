@@ -5,9 +5,9 @@ using UnityEngine;
 public class DeformationManager : MonoBehaviour
 {
 
-    const int NUM_SURFACEPOINTS = 10;
+    const int NUM_SURFACEPOINTS = 20;
     public float surfaceRadius = 1.5f;
-    const float NEIGHBOR_SPRING_STIFFNESS = 1000f;
+    float NEIGHBOR_SPRING_STIFFNESS = 1000f;
     public float tangentStrength = 5.0f;
 
     public GameObject surfacePointPrefab;
@@ -23,12 +23,27 @@ public class DeformationManager : MonoBehaviour
     private float restingLength;
 
 
+    public CircleCollider2D collider;
 
+
+    public void UpdateDeformationManagerParameters(float neighborSpringStiffness, float tangentStrength)
+    {
+        this.NEIGHBOR_SPRING_STIFFNESS = neighborSpringStiffness;
+        this.tangentStrength = tangentStrength;
+    }
+    public void UpdateSurfacePointParameters(float stiffness, float alignVelocityStrength, float maxDistance, float maxDistanceCorrectionSpeed)
+    {
+        foreach(SurfacePoint s in surfacePoints)
+        {
+            s.SetNewDeformationParameters(stiffness, alignVelocityStrength, maxDistance, maxDistanceCorrectionSpeed);
+        }
+    }
 
     private void Awake() {
         surfacePoints = new SurfacePoint[NUM_SURFACEPOINTS];
         localSurfacePointTargetPositions = new Vector3[NUM_SURFACEPOINTS];
         rb = GetComponent<Rigidbody2D>();
+        collider = GetComponentInChildren<CircleCollider2D>();
     }
 
     // Start is called before the first frame update

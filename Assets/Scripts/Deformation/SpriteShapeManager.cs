@@ -58,6 +58,7 @@ public class SpriteShapeManager : MonoBehaviour
     void Update()
     {
         UpdateSplinePointPosition();
+        controller.RefreshSpriteShape();
     }
 
 

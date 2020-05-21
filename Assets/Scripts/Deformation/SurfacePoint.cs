@@ -7,11 +7,25 @@ public class SurfacePoint : MonoBehaviour
 
     public Vector3 targetPosition;
     Rigidbody2D rb;
-    const float STIFFNESS = 200f;
+    float STIFFNESS = 200f;
 
     public Vector2 parentVelocity;
     public float circleCheckRadius = 0.1f;
     public LayerMask contactCheckMask;
+
+    float alignVelocityStrength = 10f;
+
+    float maxDistance = 1f;
+    float maxDistanceCorrectionSpeed = 0.9f;
+
+
+    public void SetNewDeformationParameters(float stiffness, float alignVelocityStrength, float maxDistance, float maxDistanceCorrectionSpeed)
+    {
+        this.STIFFNESS = stiffness;
+        this.alignVelocityStrength = alignVelocityStrength;
+        this.maxDistance = maxDistance;
+        this.maxDistanceCorrectionSpeed = maxDistanceCorrectionSpeed;
+    }
 
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
@@ -25,7 +39,22 @@ public class SurfacePoint : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        Vector2 distanceVector = new Vector2(targetPosition.x, targetPosition.y) - new Vector2(transform.position.x, transform.position.y);
+        float distance = distanceVector.magnitude;
+        Debug.DrawLine(transform.position, targetPosition);
+
+        if (distance > maxDistance)
+        {
+            Vector2 correction = distanceVector.normalized * (distance);
+            // correction = Vector2.ClampMagnitude(correction, 0.2f);
+            //transform.Translate(new Vector3(correction.x, correction.y, 0));
+            transform.position = transform.position + new Vector3(correction.x, correction.y, 0) * maxDistanceCorrectionSpeed;
+            Debug.Log(maxDistanceCorrectionSpeed);
+            
+        }
+
+
+
     }
 
     private void FixedUpdate() {
@@ -41,13 +70,16 @@ public class SurfacePoint : MonoBehaviour
         }
         */
 
-        Vector2 toTargetSpringForce = CalcTargetPosSpringForce();
-        Vector2 alignVelocityVector = (parentVelocity - rb.velocity) * 10f;
+        //enforce max distance
+
+
+        Vector2 distanceVector = new Vector2(targetPosition.x, targetPosition.y) - new Vector2(transform.position.x, transform.position.y);
+        float distance = distanceVector.magnitude;
+
+        Vector2 toTargetSpringForce = CalcTargetPosSpringForce(distanceVector, distance);
+        Vector2 alignVelocityVector = (parentVelocity - rb.velocity) * alignVelocityStrength;
 
         Vector2 fullForce = toTargetSpringForce + alignVelocityVector;
-
-
-
 
 
         //damping
@@ -56,13 +88,13 @@ public class SurfacePoint : MonoBehaviour
         rb.AddForce(fullForce);
 
 
+
+
     }
 
-    Vector2 CalcTargetPosSpringForce()
+    Vector2 CalcTargetPosSpringForce(Vector2 distanceVector, float distance)
     {
         //calculate spring force
-        Vector2 distanceVector = new Vector2(targetPosition.x, targetPosition.y) - new Vector2(transform.position.x, transform.position.y);
-        float distance = distanceVector.magnitude;
         Vector2 direction = distanceVector.normalized;
         float delta = distance - 0.01f;
 

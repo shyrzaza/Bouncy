@@ -26,6 +26,14 @@ public class PlayerMovementPrototype : MonoBehaviour
     public float counterGravity = 49.05f;
 
 
+    bool inContact = false;
+    bool inContactLastFrame = false;
+    string contactTag = "";
+
+    public delegate void voidDelegate(PlayerStateBehaviour player, string tag);
+    public static voidDelegate OnContact;
+
+
 
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
@@ -49,14 +57,28 @@ public class PlayerMovementPrototype : MonoBehaviour
        // rb.AddForce(Vector2.up * 49.05f * rb.mass);
        //F = m * g
     }
+
+
     // Update is called once per frame
     void Update()
     {
 
-       
+
+        //check for contact and trigger event
+        inContact = deformationManager.CheckForContact(out contactTag);
+        if(inContact && !inContactLastFrame)
+        {
+            if(OnContact != null)
+            {
+                OnContact(GetComponent<PlayerStateBehaviour>(), contactTag);
+            }
+        }
+        inContactLastFrame = inContact;
 
 
-        if(playerStateBehaviour.GetCurrentPlayerState() == PlayerState.SOFT)
+
+
+        if (playerStateBehaviour.GetCurrentPlayerState() == PlayerState.SOFT)
         {
 
             if(!jumpCharge)
@@ -70,11 +92,10 @@ public class PlayerMovementPrototype : MonoBehaviour
             ///Jumping
             ///
 
-            string tag = "";
-            if (deformationManager.CheckForContact(out tag))
+            if (inContact)
             {
 
-                if (tag == "Sticky")
+                if (contactTag == "Sticky")
                 {
                     if(!jumpCharge)
                     {

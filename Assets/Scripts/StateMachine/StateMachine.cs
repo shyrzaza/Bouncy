@@ -46,6 +46,22 @@ public class StateMachine<T>{
 		}
 	}
 
+
+    public void FixedUpdate()
+    {
+        if (globalState != null)
+        {
+            globalState.FixedExecute(owner);
+        }
+
+        if (currentState != null)
+        {
+
+            currentState.FixedExecute(owner);
+        }
+    }
+
+
 	public void ChangeState(State<T> newState)
 	{
 		previousState = currentState;

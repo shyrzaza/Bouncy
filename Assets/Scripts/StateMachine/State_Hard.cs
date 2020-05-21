@@ -15,10 +15,12 @@ public class State_Hard : State<PlayerStateBehaviour>
     {
         //Debug.Log("Enter hard");
         player.circleCollider.sharedMaterial = player.hardMaterial;
+        PlayerMovementPrototype.OnContact += OnContact;
     }
     public override void Exit(PlayerStateBehaviour player)
     {
         //Debug.Log("Exit hard");
+        PlayerMovementPrototype.OnContact -= OnContact;
     }
     public override void Execute(PlayerStateBehaviour player)
     {
@@ -37,6 +39,18 @@ public class State_Hard : State<PlayerStateBehaviour>
         {
             player.ChangeState(StateManager.Instance.softState);
         }
+    }
+
+    public override void FixedExecute(PlayerStateBehaviour entity)
+    {
+
+    }
+
+
+    public override void OnContact(PlayerStateBehaviour player, string tag)
+    {
+        Debug.Log("OnContactSoft");
+
     }
 
     public override string ToString()

@@ -17,11 +17,12 @@ public class PlayerStateBehaviour : MonoBehaviour
     public PhysicsMaterial2D softMaterial;
     public PhysicsMaterial2D bouncyMaterial;
     public PhysicsMaterial2D hardMaterial;
-
+    public DeformationManager deformationManager;
 
     private void Awake()
     {
         circleCollider = GetComponentInChildren<CircleCollider2D>();
+        deformationManager = GetComponent<DeformationManager>();
     }
 
 
@@ -41,6 +42,11 @@ public class PlayerStateBehaviour : MonoBehaviour
     void Update()
     {
         SM.Update();
+    }
+
+    void FixedUpdate()
+    {
+        SM.FixedUpdate();
     }
 
     public void ChangeState(State<PlayerStateBehaviour> s)

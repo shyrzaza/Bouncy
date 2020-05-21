@@ -15,6 +15,19 @@ public class State_Global : State<PlayerStateBehaviour>
         //GetCommands
     }
 
+    public override void FixedExecute(PlayerStateBehaviour entity)
+    {
+
+    }
+
+
+
+    public override void OnContact(PlayerStateBehaviour player, string tag)
+    {
+
+    }
+
+
     public override string ToString()
     {
         return "Global";

@@ -1,0 +1,43 @@
+
+
+
+
+Voreinstellung:
+
+DeformationManager
+Number of surfacepoints
+
+DeformationManager
+surface radius 
+
+
+
+weich:
+
+DeformationManager
+neighbor spring stiffness 1000f, fuer formerhaltung
+tangent strength 5.0f, fuer sprite shape
+
+SurfacePoint
+Stiffness = 200;
+alignVelocityStrength = 10f;
+
+maxDistance = 1.0f
+maxDistanceCorrectionSpeed = 0.9f;
+
+
+
+bouncy
+
+
+
+
+
+
+
+
+
+
+
+
+
