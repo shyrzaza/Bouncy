@@ -28,7 +28,7 @@ public class BreakableObject : MonoBehaviour
         {
 
             //check consistency
-            if (other.gameObject.transform.root.gameObject.GetComponent<PlayerStateBehaviour>().GetCurrentPlayerState() != PlayerState.HARD)
+            if (other.gameObject.GetComponentInParent<PlayerStateBehaviour>().GetCurrentPlayerState() != PlayerState.HARD)
             {
                 return;
             }
