@@ -23,6 +23,7 @@
 
 		Lighting On // What does this do?
 		ZWrite Off
+		Cull Off
 		Blend SrcAlpha OneMinusSrcAlpha
 
         Pass

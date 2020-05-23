@@ -8,8 +8,6 @@ public class LevelManager : MonoBehaviour
 
     private static LevelManager _instance = null;
 
-    private static int currentLevel = 0;
-
     public static LevelManager instance
     {
         get
@@ -50,12 +48,12 @@ public class LevelManager : MonoBehaviour
     public void ClearLevel()
     {
         Debug.Log("Cleared the Level!");
-        SceneManager.LoadScene(++currentLevel);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
 
     public void ReloadLevel()
     {
-        SceneManager.LoadScene(currentLevel);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
